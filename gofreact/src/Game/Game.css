@@ -1,0 +1,23 @@
+.board {
+    position: relative;
+    margin: 0 auto;
+    background-color: rgb(255, 254, 254);
+    background-image:
+        linear-gradient(#333 1px, transparent 1px),
+        linear-gradient(90deg, #333 1px, transparent 1px);
+    /* border: 1px #333 solid; */
+}
+
+.Cell {
+    background: red;
+    position: absolute;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.button {
+    margin-left: 12px;
+    cursor: pointer;
+}
