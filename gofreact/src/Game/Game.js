@@ -51,7 +51,6 @@ class Game extends React.Component {
                 board[y][x] = false;
             }
         }
-
         return board;
     }
 
