@@ -9,15 +9,10 @@
 }
 
 .Cell {
-    background: red;
+    background: rgb(233, 55, 55);
     position: absolute;
 }
 
 .controls {
     margin-top: 20px;
-}
-
-.button {
-    margin-left: 12px;
-    cursor: pointer;
 }

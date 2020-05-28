@@ -1,14 +1,16 @@
 import React from 'react';
-import { Menu, Button, MenuItem } from '@material-ui/core';
+import { Menu, Button, MenuItem, ButtonGroup, Container, Typography, TextField, InputAdornment } from '@material-ui/core';
 import './Game.css';
 import DropDown from './DropDown'
 
 
-const CELL_SIZE = 20;
-const WIDTH = 160 * 5;
-const HEIGHT = 90 * 5;
+let CELL_SIZE = 20;
 
+let globalRows = 80 / CELL_SIZE
+let globalCols = 45 / CELL_SIZE
 
+// 800
+// 450
 class Cell extends React.Component {
 
     render() {
@@ -29,8 +31,8 @@ class Game extends React.Component {
 
     constructor() {
         super();
-        this.rows = HEIGHT / CELL_SIZE;
-        this.cols = WIDTH / CELL_SIZE;
+        this.rows = (this.state.boardHeight * this.state.boardScale) / CELL_SIZE;                                     ///this.rows = HEIGHT / CELL_SIZE;
+        this.cols = (this.state.boardWidth * this.state.boardScale) / CELL_SIZE;                                      ///this.cols = WIDTH / CELL_SIZE;                   
 
         this.board = this.makeEmptyBoard();
     }
@@ -40,14 +42,19 @@ class Game extends React.Component {
         isRunning: false,
         interval: 100,
         generation: 0,
-        listOpen: false
+        listOpen: false,
+        boardWidth: 80,
+        boardHeight: 45,
+        boardScale: 1,
+        rows: globalRows,
+        cols: globalCols
     }
 
     makeEmptyBoard() {
         let board = [];
-        for (let y = 0; y < this.rows; y++) {
+        for (let y = 0; y < this.state.rows; y++) {
             board[y] = [];
-            for (let x = 0; x < this.cols; x++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 board[y][x] = false;
             }
         }
@@ -67,8 +74,8 @@ class Game extends React.Component {
 
     makeCells() {
         let cells = [];
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
+        for (let y = 0; y < this.state.rows; y++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 if (this.board[y][x]) {
                     cells.push({ x, y });
                 }
@@ -87,7 +94,7 @@ class Game extends React.Component {
         const x = Math.floor(offsetX / CELL_SIZE);
         const y = Math.floor(offsetY / CELL_SIZE);
 
-        if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
+        if (x >= 0 && x <= this.cols.state && y >= 0 && y <= this.rows.state) {
             this.board[y][x] = !this.board[y][x];
         }
 
@@ -111,8 +118,8 @@ class Game extends React.Component {
         let newBoard = this.makeEmptyBoard();
         let generation = this.state.generation
 
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
+        for (let y = 0; y < this.state.rows; y++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 let vecinos = this.calculateVecinos(this.board, x, y);
                 if (this.board[y][x]) {
                     if (vecinos === 2 || vecinos === 3) {
@@ -147,7 +154,7 @@ class Game extends React.Component {
             let y1 = y + dir[0];
             let x1 = x + dir[1];
 
-            if (x1 >= 0 && x1 < this.cols && y1 >= 0 && y1 < this.rows && board[y1][x1]) {
+            if (x1 >= 0 && x1 < this.state.cols && y1 >= 0 && y1 < this.state.rows && board[y1][x1]) {
                 vecinos++;
             }
         }
@@ -155,8 +162,8 @@ class Game extends React.Component {
         return vecinos;
     }
 
-    handleIntervalChange = (event) => {
-        this.setState({ interval: event.target.value });
+    handleIntervalChange = (e) => {
+        this.setState({ interval: e.target.value });
     }
 
     handleClear = () => {
@@ -167,7 +174,7 @@ class Game extends React.Component {
 
     handleRandom = () => {
         for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 this.board[y][x] = (Math.random() >= 0.5);
             }
         }
@@ -250,34 +257,81 @@ class Game extends React.Component {
     this.setState({cells: this.makeCells()})
     }
 
+    handleScaleChangeUp = () => {
+        let scale = this.state.boardScale
+        scale++
+        console.log(scale)
+        if(scale > 0){
+            this.setState({boardScale: scale})
+            this.setBoardOffScale()
+        }else(alert('cannot go below zero'))
+    }
+
+    handleScaleChangeDown = () => {
+        let scale = this.state.boardScale
+        scale--
+        console.log(scale)
+        if(scale > 0){
+            this.setState({boardScale: scale})
+            this.setBoardOffScale()
+        } else(alert('cannot go below zero'))
+    }
+
+    setBoardOffScale = () => {
+        const {boardScale, boardWidth, boardHeight} = this.state
+        let newCols = (boardWidth * boardScale) / CELL_SIZE;
+        let newRows = (boardHeight * boardScale) / CELL_SIZE;
+        if(newCols && newRows > 0){
+            this.setState({cols:newCols, rows:newRows})
+            this.makeEmptyBoard()
+        }
+        else(alert('Can not go below zero'))
+        console.log(this.state.cols, this.state.rows)
+    }
+
+
+    
     render() {
-        const { cells, interval, isRunning, generation, listOpen } = this.state;
+        const { cells, interval, isRunning, generation, listOpen, boardWidth, boardHeight, boardScale } = this.state;
+        console.log(this.state.cols)
         return (
-            <div>
-                <div className="board"
-                    style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
+            <Container>
+                <Container className="board"
+                    style={{ width: boardWidth, height: boardHeight, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
                     onClick={this.handleClick}
                     ref={(n) => { this.boardRef = n; }}>
 
                     {cells.map(cell => (
                         <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
                     ))}
-                </div>
+                </Container>
 
-                <div className="controls">
-                    Update every <input value={this.state.interval} onChange={this.handleIntervalChange} /> milliseconds 
+                <Container className="controls">
+                    Update every
+
+                    <TextField value={this.state.interval} onChange={this.handleIntervalChange} />
+                    Miliseconds 
+                    
+                    <ButtonGroup size="small" variant="contained" color="primary">
                     {isRunning ?
-                        <button className="button" onClick={this.stopGame}>Stop</button> :
-                        <button className="button" onClick={this.runGame}>Run</button>
+                        <Button variant="contained" onClick={this.stopGame}>Stop</Button>:
+                        <Button variant="contained" onClick={this.runGame}>Run</Button>
                     }
-                    <button className="button" onClick={this.handleRandom}>Random</button>
-                    <button className="button" onClick={this.handleClear}>Clear</button>
-                    <div> Generation  {generation}</div>
+                        <Button variant="contained"  onClick={this.handleClear}>Clear</Button>
+                    </ButtonGroup>
+                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP} handleRandom={this.handleRandom}></DropDown>
+
+                    <Typography variant="h6" component="h2"> Generation:  {generation}</Typography>
+
+                    <ButtonGroup size="small" variant="contained" color="secondary">
+                    <Button onClick={this.handleScaleChangeUp}>+</Button>
+                    <Button onClick={this.handleScaleChangeDown}>-</Button>
+                    </ButtonGroup>
                     
-                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP}></DropDown>
                     
-                </div>
-            </div>
+                    
+                </Container>
+            </Container>
         );
     }
 }
