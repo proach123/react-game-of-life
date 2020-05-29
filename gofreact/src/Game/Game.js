@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Button, MenuItem, ButtonGroup, Container, Typography, TextField, InputAdornment } from '@material-ui/core';
+import { Menu, Button, MenuItem, ButtonGroup, Container, Typography, TextField } from '@material-ui/core';
 import './Game.css';
 import DropDown from './DropDown'
 
@@ -73,6 +73,8 @@ class Game extends React.Component {
     }
 
     makeCells() {
+        console.log(this.state.rows)
+        console.log(this.state.boardScale)
         let cells = [];
         for (let y = 0; y < this.state.rows; y++) {
             for (let x = 0; x < this.state.cols; x++) {
@@ -91,10 +93,10 @@ class Game extends React.Component {
         const offsetX = event.clientX - elemOffset.x;
         const offsetY = event.clientY - elemOffset.y;
         
-        const x = Math.floor(offsetX / CELL_SIZE);
-        const y = Math.floor(offsetY / CELL_SIZE);
+        const x = Math.floor((offsetX) / CELL_SIZE);
+        const y = Math.floor((offsetY) / CELL_SIZE);
 
-        if (x >= 0 && x <= this.cols.state && y >= 0 && y <= this.rows.state) {
+        if (x >= 0 && x <= this.state.cols && y >= 0 && y <= this.state.rows) {
             this.board[y][x] = !this.board[y][x];
         }
 
@@ -278,15 +280,22 @@ class Game extends React.Component {
     }
 
     setBoardOffScale = () => {
+        let newBoard = this.makeEmptyBoard()
         const {boardScale, boardWidth, boardHeight} = this.state
         let newCols = (boardWidth * boardScale) / CELL_SIZE;
         let newRows = (boardHeight * boardScale) / CELL_SIZE;
         if(newCols && newRows > 0){
             this.setState({cols:newCols, rows:newRows})
-            this.makeEmptyBoard()
+            
+            this.handleNewBoard(newBoard)
         }
         else(alert('Can not go below zero'))
         console.log(this.state.cols, this.state.rows)
+    }
+
+    handleNewBoard = (board)=>{
+        console.log(board)
+        this.board = board
     }
 
 
@@ -297,7 +306,7 @@ class Game extends React.Component {
         return (
             <Container>
                 <Container className="board"
-                    style={{ width: boardWidth, height: boardHeight, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
+                    style={{ width: boardWidth * boardScale, height: boardHeight * boardScale, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
                     onClick={this.handleClick}
                     ref={(n) => { this.boardRef = n; }}>
 
@@ -323,10 +332,10 @@ class Game extends React.Component {
 
                     <Typography variant="h6" component="h2"> Generation:  {generation}</Typography>
 
-                    <ButtonGroup size="small" variant="contained" color="secondary">
+                    {/* <ButtonGroup size="small" variant="contained" color="secondary">
                     <Button onClick={this.handleScaleChangeUp}>+</Button>
                     <Button onClick={this.handleScaleChangeDown}>-</Button>
-                    </ButtonGroup>
+                    </ButtonGroup> */}
                     
                     
                     
