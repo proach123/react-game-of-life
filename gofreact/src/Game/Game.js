@@ -4,7 +4,7 @@ import './Game.css';
 import DropDown from './DropDown'
 
 
-let CELL_SIZE = 20;
+let cellSize = 20;
 
 let globalRows = 450 
 let globalCols = 800 
@@ -17,10 +17,10 @@ class Cell extends React.Component {
         const { x, y } = this.props;
         return (
             <div className="Cell" style={{
-                left: `${CELL_SIZE * x + 1}px`,
-                top: `${CELL_SIZE * y + 1}px`,
-                width: `${CELL_SIZE - 1}px`,
-                height: `${CELL_SIZE - 1}px`,
+                left: `${cellSize * x + 1}px`,
+                top: `${cellSize * y + 1}px`,
+                width: `${cellSize - 1}px`,
+                height: `${cellSize - 1}px`,
             }} />
         );
     }
@@ -31,8 +31,8 @@ class Game extends React.Component {
 
     constructor(props) {
         super(props);
-        this.rows = globalRows / CELL_SIZE;                                     ///this.rows = HEIGHT / CELL_SIZE;
-        this.cols = globalCols / CELL_SIZE;                                      ///this.cols = WIDTH / CELL_SIZE;                   
+        this.rows = globalRows / cellSize;                                     ///this.rows = HEIGHT / cellSize;
+        this.cols = globalCols / cellSize;                                      ///this.cols = WIDTH / cellSize;                   
         this.state = {
             cells: [],
             isRunning: false,
@@ -89,8 +89,8 @@ class Game extends React.Component {
         const offsetX = event.clientX - elemOffset.x;
         const offsetY = event.clientY - elemOffset.y;
         
-        const x = Math.floor((offsetX) / CELL_SIZE);
-        const y = Math.floor((offsetY) / CELL_SIZE);
+        const x = Math.floor((offsetX) / cellSize);
+        const y = Math.floor((offsetY) / cellSize);
 
         if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
             this.board[y][x] = !this.board[y][x];
@@ -294,8 +294,8 @@ class Game extends React.Component {
     // setBoardOffScale = () => {
     //     let newBoard = this.makeEmptyBoard()
     //     const {boardScale, boardWidth, boardHeight} = this.state
-    //     let newCols = (boardWidth * boardScale) / CELL_SIZE;
-    //     let newRows = (boardHeight * boardScale) / CELL_SIZE;
+    //     let newCols = (boardWidth * boardScale) / cellSize;
+    //     let newRows = (boardHeight * boardScale) / cellSize;
     //     if(newCols && newRows > 0){
     //         this.setState({cols:newCols, rows:newRows})
             
@@ -313,7 +313,7 @@ class Game extends React.Component {
         return (
             <Container>
                 <Container className="board"
-                    style={{ width: boardWidth * boardScale, height: boardHeight * boardScale, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
+                    style={{ width: boardWidth * boardScale, height: boardHeight * boardScale, backgroundSize: `${cellSize}px ${cellSize}px`}}
                     onClick={this.handleClick}
                     ref={(n) => { this.boardRef = n; }}>
 
@@ -330,7 +330,7 @@ class Game extends React.Component {
                     
                     <ButtonGroup size="small" variant="contained" color="primary">
                     {isRunning ?
-                        <Button variant="contained" onClick={this.stopGame}>Stop</Button>:
+                        <Button variant="contained" color="secondary" onClick={this.stopGame}>Stop</Button>:
                         <Button variant="contained" onClick={this.runGame}>Run</Button>
                     }
                         <Button variant="contained"  onClick={this.handleClear}>Clear</Button>
