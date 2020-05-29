@@ -1,13 +1,13 @@
 import React from 'react';
-import { Menu, Button, MenuItem, ButtonGroup, Container, Typography, TextField } from '@material-ui/core';
+import {  Button, ButtonGroup, Container, Typography, TextField } from '@material-ui/core';
 import './Game.css';
 import DropDown from './DropDown'
 
 
 let CELL_SIZE = 20;
 
-let globalRows = 80 / CELL_SIZE
-let globalCols = 45 / CELL_SIZE
+let globalRows = 450 
+let globalCols = 800 
 
 // 800
 // 450
@@ -29,32 +29,30 @@ class Cell extends React.Component {
 
 class Game extends React.Component {
 
-    constructor() {
-        super();
-        this.rows = (this.state.boardHeight * this.state.boardScale) / CELL_SIZE;                                     ///this.rows = HEIGHT / CELL_SIZE;
-        this.cols = (this.state.boardWidth * this.state.boardScale) / CELL_SIZE;                                      ///this.cols = WIDTH / CELL_SIZE;                   
-
+    constructor(props) {
+        super(props);
+        this.rows = globalRows / CELL_SIZE;                                     ///this.rows = HEIGHT / CELL_SIZE;
+        this.cols = globalCols / CELL_SIZE;                                      ///this.cols = WIDTH / CELL_SIZE;                   
+        this.state = {
+            cells: [],
+            isRunning: false,
+            interval: 100,
+            generation: 0,
+            listOpen: false,
+            boardWidth: 800,
+            boardHeight: 450,
+            boardScale: 1
+        }
         this.board = this.makeEmptyBoard();
     }
 
-    state = {
-        cells: [],
-        isRunning: false,
-        interval: 100,
-        generation: 0,
-        listOpen: false,
-        boardWidth: 80,
-        boardHeight: 45,
-        boardScale: 1,
-        rows: globalRows,
-        cols: globalCols
-    }
+    
 
     makeEmptyBoard() {
         let board = [];
-        for (let y = 0; y < this.state.rows; y++) {
+        for (let y = 0; y < this.rows; y++) {
             board[y] = [];
-            for (let x = 0; x < this.state.cols; x++) {
+            for (let x = 0; x < this.cols; x++) {
                 board[y][x] = false;
             }
         }
@@ -73,11 +71,10 @@ class Game extends React.Component {
     }
 
     makeCells() {
-        console.log(this.state.rows)
-        console.log(this.state.boardScale)
+
         let cells = [];
-        for (let y = 0; y < this.state.rows; y++) {
-            for (let x = 0; x < this.state.cols; x++) {
+        for (let y = 0; y < this.rows; y++) {
+            for (let x = 0; x < this.cols; x++) {
                 if (this.board[y][x]) {
                     cells.push({ x, y });
                 }
@@ -96,7 +93,7 @@ class Game extends React.Component {
         const x = Math.floor((offsetX) / CELL_SIZE);
         const y = Math.floor((offsetY) / CELL_SIZE);
 
-        if (x >= 0 && x <= this.state.cols && y >= 0 && y <= this.state.rows) {
+        if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
             this.board[y][x] = !this.board[y][x];
         }
 
@@ -120,8 +117,8 @@ class Game extends React.Component {
         let newBoard = this.makeEmptyBoard();
         let generation = this.state.generation
 
-        for (let y = 0; y < this.state.rows; y++) {
-            for (let x = 0; x < this.state.cols; x++) {
+        for (let y = 0; y < this.rows; y++) {
+            for (let x = 0; x < this.cols; x++) {
                 let vecinos = this.calculateVecinos(this.board, x, y);
                 if (this.board[y][x]) {
                     if (vecinos === 2 || vecinos === 3) {
@@ -156,7 +153,7 @@ class Game extends React.Component {
             let y1 = y + dir[0];
             let x1 = x + dir[1];
 
-            if (x1 >= 0 && x1 < this.state.cols && y1 >= 0 && y1 < this.state.rows && board[y1][x1]) {
+            if (x1 >= 0 && x1 < this.cols && y1 >= 0 && y1 < this.rows && board[y1][x1]) {
                 vecinos++;
             }
         }
@@ -176,7 +173,7 @@ class Game extends React.Component {
 
     handleRandom = () => {
         for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.state.cols; x++) {
+            for (let x = 0; x < this.cols; x++) {
                 this.board[y][x] = (Math.random() >= 0.5);
             }
         }
@@ -259,50 +256,61 @@ class Game extends React.Component {
     this.setState({cells: this.makeCells()})
     }
 
-    handleScaleChangeUp = () => {
-        let scale = this.state.boardScale
-        scale++
-        console.log(scale)
-        if(scale > 0){
-            this.setState({boardScale: scale})
-            this.setBoardOffScale()
-        }else(alert('cannot go below zero'))
-    }
-
-    handleScaleChangeDown = () => {
-        let scale = this.state.boardScale
-        scale--
-        console.log(scale)
-        if(scale > 0){
-            this.setState({boardScale: scale})
-            this.setBoardOffScale()
-        } else(alert('cannot go below zero'))
-    }
-
-    setBoardOffScale = () => {
-        let newBoard = this.makeEmptyBoard()
-        const {boardScale, boardWidth, boardHeight} = this.state
-        let newCols = (boardWidth * boardScale) / CELL_SIZE;
-        let newRows = (boardHeight * boardScale) / CELL_SIZE;
-        if(newCols && newRows > 0){
-            this.setState({cols:newCols, rows:newRows})
-            
-            this.handleNewBoard(newBoard)
+    handlePat = () => {
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][5] = true
         }
-        else(alert('Can not go below zero'))
-        console.log(this.state.cols, this.state.rows)
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][15] = true
+        }
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][25] = true
+        }
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][35] = true
+        }
+    this.setState({cells: this.makeCells()})
     }
 
-    handleNewBoard = (board)=>{
-        console.log(board)
-        this.board = board
-    }
+    // handleScaleChangeUp = () => {
+    //     let scale = this.boardScale
+    //     scale++
+    //     console.log(scale)
+    //     if(scale > 0){
+    //         this.setState({boardScale: scale})
+    //         this.setBoardOffScale()
+    //     }else(alert('cannot go below zero'))
+    // }
+
+    // handleScaleChangeDown = () => {
+    //     let scale = this.boardScale
+    //     scale--
+    //     console.log(scale)
+    //     if(scale > 0){
+    //         this.setState({boardScale: scale})
+    //         this.setBoardOffScale()
+    //     } else(alert('cannot go below zero'))
+    // }
+
+    // setBoardOffScale = () => {
+    //     let newBoard = this.makeEmptyBoard()
+    //     const {boardScale, boardWidth, boardHeight} = this.state
+    //     let newCols = (boardWidth * boardScale) / CELL_SIZE;
+    //     let newRows = (boardHeight * boardScale) / CELL_SIZE;
+    //     if(newCols && newRows > 0){
+    //         this.setState({cols:newCols, rows:newRows})
+            
+    //         this.handleNewBoard(newBoard)
+    //     }
+    //     else(alert('Can not go below zero'))
+    //     console.log(this.state.cols, this.state.rows)
+    // }
 
 
     
     render() {
         const { cells, interval, isRunning, generation, listOpen, boardWidth, boardHeight, boardScale } = this.state;
-        console.log(this.state.cols)
+
         return (
             <Container>
                 <Container className="board"
@@ -328,7 +336,7 @@ class Game extends React.Component {
                     }
                         <Button variant="contained"  onClick={this.handleClear}>Clear</Button>
                     </ButtonGroup>
-                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP} handleRandom={this.handleRandom}></DropDown>
+                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP} handleRandom={this.handleRandom} handlePat={this.handlePat}></DropDown>
 
                     <Typography variant="h6" component="h2"> Generation:  {generation}</Typography>
 

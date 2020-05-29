@@ -29,6 +29,11 @@ export default function SimpleMenu(props) {
       props.handleRandom()
   }
 
+  const pat = () => {
+      handleClose()
+      props.handlePat()
+  }
+
   return (
     <div>
       <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
@@ -44,7 +49,7 @@ export default function SimpleMenu(props) {
         <MenuItem onClick={gliderGun}>Glider Gun</MenuItem>
         <MenuItem onClick={rip}>RIP John Conway</MenuItem>
         <MenuItem onClick={random}>Random Config</MenuItem>
-        <MenuItem onClick={handleClose}>Pat's Pick</MenuItem>
+        <MenuItem onClick={pat}>Pat's Pick</MenuItem>
       </Menu>
     </div>
   );
