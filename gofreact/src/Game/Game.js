@@ -1,14 +1,16 @@
 import React from 'react';
-import { Menu, Button, MenuItem } from '@material-ui/core';
+import {  Button, ButtonGroup, Container, Typography, TextField } from '@material-ui/core';
 import './Game.css';
 import DropDown from './DropDown'
 
 
-const CELL_SIZE = 20;
-const WIDTH = 160 * 5;
-const HEIGHT = 90 * 5;
+let CELL_SIZE = 20;
 
+let globalRows = 450 
+let globalCols = 800 
 
+// 800
+// 450
 class Cell extends React.Component {
 
     render() {
@@ -27,21 +29,24 @@ class Cell extends React.Component {
 
 class Game extends React.Component {
 
-    constructor() {
-        super();
-        this.rows = HEIGHT / CELL_SIZE;
-        this.cols = WIDTH / CELL_SIZE;
-
+    constructor(props) {
+        super(props);
+        this.rows = globalRows / CELL_SIZE;                                     ///this.rows = HEIGHT / CELL_SIZE;
+        this.cols = globalCols / CELL_SIZE;                                      ///this.cols = WIDTH / CELL_SIZE;                   
+        this.state = {
+            cells: [],
+            isRunning: false,
+            interval: 100,
+            generation: 0,
+            listOpen: false,
+            boardWidth: 800,
+            boardHeight: 450,
+            boardScale: 1
+        }
         this.board = this.makeEmptyBoard();
     }
 
-    state = {
-        cells: [],
-        isRunning: false,
-        interval: 100,
-        generation: 0,
-        listOpen: false
-    }
+    
 
     makeEmptyBoard() {
         let board = [];
@@ -65,6 +70,7 @@ class Game extends React.Component {
     }
 
     makeCells() {
+
         let cells = [];
         for (let y = 0; y < this.rows; y++) {
             for (let x = 0; x < this.cols; x++) {
@@ -83,8 +89,8 @@ class Game extends React.Component {
         const offsetX = event.clientX - elemOffset.x;
         const offsetY = event.clientY - elemOffset.y;
         
-        const x = Math.floor(offsetX / CELL_SIZE);
-        const y = Math.floor(offsetY / CELL_SIZE);
+        const x = Math.floor((offsetX) / CELL_SIZE);
+        const y = Math.floor((offsetY) / CELL_SIZE);
 
         if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
             this.board[y][x] = !this.board[y][x];
@@ -154,8 +160,8 @@ class Game extends React.Component {
         return vecinos;
     }
 
-    handleIntervalChange = (event) => {
-        this.setState({ interval: event.target.value });
+    handleIntervalChange = (e) => {
+        this.setState({ interval: e.target.value });
     }
 
     handleClear = () => {
@@ -249,34 +255,99 @@ class Game extends React.Component {
     this.setState({cells: this.makeCells()})
     }
 
+    handlePat = () => {
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][5] = true
+        }
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][15] = true
+        }
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][25] = true
+        }
+        for(let i = 0; i < 10; i++){
+            this.board[5 + i][35] = true
+        }
+    this.setState({cells: this.makeCells()})
+    }
+
+    // handleScaleChangeUp = () => {
+    //     let scale = this.boardScale
+    //     scale++
+    //     console.log(scale)
+    //     if(scale > 0){
+    //         this.setState({boardScale: scale})
+    //         this.setBoardOffScale()
+    //     }else(alert('cannot go below zero'))
+    // }
+
+    // handleScaleChangeDown = () => {
+    //     let scale = this.boardScale
+    //     scale--
+    //     console.log(scale)
+    //     if(scale > 0){
+    //         this.setState({boardScale: scale})
+    //         this.setBoardOffScale()
+    //     } else(alert('cannot go below zero'))
+    // }
+
+    // setBoardOffScale = () => {
+    //     let newBoard = this.makeEmptyBoard()
+    //     const {boardScale, boardWidth, boardHeight} = this.state
+    //     let newCols = (boardWidth * boardScale) / CELL_SIZE;
+    //     let newRows = (boardHeight * boardScale) / CELL_SIZE;
+    //     if(newCols && newRows > 0){
+    //         this.setState({cols:newCols, rows:newRows})
+            
+    //         this.handleNewBoard(newBoard)
+    //     }
+    //     else(alert('Can not go below zero'))
+    //     console.log(this.state.cols, this.state.rows)
+    // }
+
+
+    
     render() {
-        const { cells, interval, isRunning, generation, listOpen } = this.state;
+        const { cells, interval, isRunning, generation, listOpen, boardWidth, boardHeight, boardScale } = this.state;
+
         return (
-            <div>
-                <div className="board"
-                    style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
+            <Container>
+                <Container className="board"
+                    style={{ width: boardWidth * boardScale, height: boardHeight * boardScale, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`}}
                     onClick={this.handleClick}
                     ref={(n) => { this.boardRef = n; }}>
 
                     {cells.map(cell => (
                         <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
                     ))}
-                </div>
+                </Container>
 
-                <div className="controls">
-                    Update every <input value={this.state.interval} onChange={this.handleIntervalChange} /> milliseconds 
+                <Container className="controls">
+                    Update every
+
+                    <TextField value={this.state.interval} onChange={this.handleIntervalChange} />
+                    Miliseconds 
+                    
+                    <ButtonGroup size="small" variant="contained" color="primary">
                     {isRunning ?
-                        <button className="button" onClick={this.stopGame}>Stop</button> :
-                        <button className="button" onClick={this.runGame}>Run</button>
+                        <Button variant="contained" onClick={this.stopGame}>Stop</Button>:
+                        <Button variant="contained" onClick={this.runGame}>Run</Button>
                     }
-                    <button className="button" onClick={this.handleRandom}>Random</button>
-                    <button className="button" onClick={this.handleClear}>Clear</button>
-                    <div> Generation  {generation}</div>
+                        <Button variant="contained"  onClick={this.handleClear}>Clear</Button>
+                    </ButtonGroup>
+                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP} handleRandom={this.handleRandom} handlePat={this.handlePat}></DropDown>
+
+                    <Typography variant="h6" component="h2"> Generation:  {generation}</Typography>
+
+                    {/* <ButtonGroup size="small" variant="contained" color="secondary">
+                    <Button onClick={this.handleScaleChangeUp}>+</Button>
+                    <Button onClick={this.handleScaleChangeDown}>-</Button>
+                    </ButtonGroup> */}
                     
-                    <DropDown handleGlider={this.handleGlider} handleRIP={this.handleRIP}></DropDown>
                     
-                </div>
-            </div>
+                    
+                </Container>
+            </Container>
         );
     }
 }
